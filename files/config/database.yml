@@ -1,0 +1,70 @@
+# SQLite locally (no Postgres required for development), Postgres in production.
+#
+# Production runs four databases on the same Postgres instance — the standard
+# Rails 8 Solid Queue / Cache / Cable layout. `db:prepare` natively creates and
+# migrates each one.
+sqlite_default: &sqlite_default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+deployed_default: &deployed_default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV["POSTGRES_HOST"] %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  sslmode: require
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  primary:
+    <<: *sqlite_default
+    database: storage/development.sqlite3
+  cache:
+    <<: *sqlite_default
+    database: storage/development_cache.sqlite3
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *sqlite_default
+    database: storage/development_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *sqlite_default
+    database: storage/development_cable.sqlite3
+    migrations_paths: db/cable_migrate
+
+test:
+  primary:
+    <<: *sqlite_default
+    database: storage/test.sqlite3
+  cache:
+    <<: *sqlite_default
+    database: storage/test_cache.sqlite3
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *sqlite_default
+    database: storage/test_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *sqlite_default
+    database: storage/test_cable.sqlite3
+    migrations_paths: db/cable_migrate
+
+production:
+  primary: &primary_production
+    <<: *deployed_default
+    database: <%= ENV.fetch("POSTGRES_DB") { "APPNAME_production" } %>
+  cache:
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB") { "APPNAME_production" } %>_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB") { "APPNAME_production" } %>_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB") { "APPNAME_production" } %>_cable
+    migrations_paths: db/cable_migrate

@@ -1,0 +1,20 @@
+default: &default
+  permissions:
+    - key: app.access
+      description: Access the app
+  policies:
+    - api_name: organization-owner
+      permissions:
+        - app.access
+    - api_name: organization-member
+      permissions:
+        - app.access
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

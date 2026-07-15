@@ -1,0 +1,32 @@
+# APPNAME - Developer Commands
+
+# Force Docker amd64 for M1/M2/M3 Macs building for AWS
+export DOCKER_DEFAULT_PLATFORM := "linux/amd64"
+
+# Show all commands
+default:
+    @just --list --unsorted
+
+# ─────────────────────────────────────────────────────────────
+# APP
+# ─────────────────────────────────────────────────────────────
+
+# [app] First-run setup (bundle, db:prepare, etc.)
+setup:
+    bin/setup --skip-server
+
+# [app] Run the dev fleet (web + css + worker)
+dev:
+    bin/dev
+
+# [app] Run the test suite
+test:
+    bundle exec rspec
+
+# [app] Run CI checks (bundle audit, brakeman, importmap audit)
+ci:
+    bin/ci
+
+# [app] Run Rubocop with autocorrect
+lint:
+    bundle exec rubocop --autocorrect-all

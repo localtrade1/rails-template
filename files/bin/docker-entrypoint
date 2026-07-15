@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+# If running the rails server, then create or migrate existing database.
+# Solid Queue / Cache / Cable each get their own database in production —
+# db:prepare creates and migrates each one.
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+
+exec "${@}"

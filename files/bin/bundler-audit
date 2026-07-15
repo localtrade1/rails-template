@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require "rubygems"
+require "bundler/setup"
+
+# Update the local advisory database before scanning so freshly-disclosed
+# CVEs land in this run rather than waiting for the next CI cron.
+require "bundler/audit/cli"
+Bundler::Audit::CLI.start(["update"])
+load Gem.bin_path("bundler-audit", "bundler-audit")

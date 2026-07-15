@@ -1,0 +1,6 @@
+# Advisory IDs to ignore in bundler-audit scans. Each entry should include a
+# reason and an expiry date — review and prune quarterly.
+#
+# ignore:
+#   - CVE-2024-XXXXX  # reason: not exploitable in our usage. expires: 2026-12-31
+ignore: []

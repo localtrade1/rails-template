@@ -1,0 +1,3 @@
+# Keep this in sync with Dockerfile RUBY_VERSION
+[tools]
+ruby = "4.0.1"
