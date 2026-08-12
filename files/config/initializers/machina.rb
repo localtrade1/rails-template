@@ -20,7 +20,9 @@ Machina.configure do |config|
   config.service_token = ENV.fetch("MACHINA_SERVICE_TOKEN", credentials[:service_token])
 
   config.identity_service_url  = ENV.fetch("MACHINA_IDENTITY_URL", "http://localhost:3100")
-  config.identity_callback_uri = ENV.fetch("MACHINA_IDENTITY_CALLBACK_URI", "http://localhost:#{ENV.fetch('PORT', APPNAME_PORT)}/auth/machina/callback")
+
+  base_url = ENV.fetch("BASE_URL", "http://localhost:#{ENV.fetch('PORT', APPNAME_PORT)}")
+  config.identity_callback_uri = "#{base_url}/machina/callback"
 
   config.cache_ttl   = 30.days
   config.cache_store = Rails.cache
