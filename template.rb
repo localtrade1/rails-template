@@ -92,7 +92,7 @@ create_file "Gemfile", <<~RUBY
   # Console SSO protocol; point it at your own identity service via
   # MACHINA_IDENTITY_URL, or swap it for Devise / Rails 8 built-in auth /
   # OmniAuth. See docs/DEPLOYMENT.md and the auth notes in README.md.
-  gem "machina-auth", "0.3.0", require: "machina"
+  gem "machina-auth", "1.0.2", require: "machina"
 
   # Windows zoneinfo
   gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -253,10 +253,11 @@ RUBY
 remove_file "config/routes.rb"
 create_file "config/routes.rb", <<~RUBY
   Rails.application.routes.draw do
-    # Authentication (machina-auth)
-    get "login",                   to: "auth#login",            as: :login
-    get "auth/machina/callback",   to: "auth#machina_callback"
-    delete "logout",               to: "auth#logout",           as: :logout
+    # Authentication (machina-auth). The engine serves GET /machina/callback,
+    # which verifies the login state nonce and sets the session cookie.
+    get "login",     to: "auth#login", as: :login
+    delete "logout", to: "auth#logout", as: :logout
+    mount Machina::Engine => "/machina"
 
     # Health check (used by ALB target groups + Kamal)
     get "up" => "rails/health#show", as: :rails_health_check
@@ -293,8 +294,9 @@ create_file ".env.example", <<~ENV, force: true
   MACHINA_PRODUCT_ID=
   MACHINA_SERVICE_TOKEN=
   MACHINA_IDENTITY_URL=http://localhost:3100
-  # In production, set this to your app's public callback URL.
-  MACHINA_IDENTITY_CALLBACK_URI=http://localhost:#{@port}/auth/machina/callback
+  # App public origin; the machina-auth callback (<BASE_URL>/machina/callback) is
+  # derived from it. In production set it to your app's public URL.
+  BASE_URL=http://localhost:#{@port}
 
   # Org email domain for User#org_member? checks
   MACHINA_ORG_DOMAIN=#{@org_email_domain}

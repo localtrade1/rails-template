@@ -26,12 +26,18 @@ The fleet runs on port `APPNAME_PORT`.
 
 ## Auth flow
 
+The Console handshake is owned by machina-auth — `authenticate!` starts it and
+the gem's engine (mounted at `/machina`) serves the callback. Don't hand-roll one.
+
 1. Unauthenticated request hits any controller → `before_action :authenticate!`
-   redirects to `/login`.
-2. `AuthController#login` renders a link to the identity service authorize URL.
-3. User completes OAuth at the identity service, which redirects back to
-   `/auth/machina/callback?token=...`.
-4. `AuthController#machina_callback` sets the `machina_session` cookie.
+   mints a single-use CSRF state nonce (signed httponly cookie) and redirects to
+   the identity service authorize URL with the nonce.
+2. `/login` renders a branded page whose button points at a protected path (so
+   the gem's `authenticate!` mints the state).
+3. User completes OAuth, which redirects back to
+   `/machina/callback?token=...&state=...`.
+4. The gem's `Machina::CallbacksController` verifies the state, sets the
+   `machina_session` cookie, and redirects to a relative `return_to`.
 5. `ApplicationController#current_user` resolves the session and lazily
    upserts the `User` record from the authorized session attributes.
 

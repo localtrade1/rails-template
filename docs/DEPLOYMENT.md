@@ -33,8 +33,9 @@ template requires:
 5. **Secrets / environment** delivered to both processes:
    - `RAILS_MASTER_KEY` (or `config/credentials`), `DATABASE_URL`(s)
    - `MACHINA_PRODUCT_ID`, `MACHINA_SERVICE_TOKEN`, `MACHINA_IDENTITY_URL`,
-     `MACHINA_IDENTITY_CALLBACK_URI` — only if you keep the machina-auth layer
-     (see "Authentication" below)
+     `BASE_URL` (the app's public origin; the machina-auth callback
+     `<BASE_URL>/machina/callback` is derived from it) — only if you keep the
+     machina-auth layer (see "Authentication" below)
    - `OPENROUTER_API_KEY` — only if the app uses the LLM stack
    - `SENTRY_DSN` — only if you want error tracking
 6. **Object storage** (S3 or compatible) for Active Storage in production.
